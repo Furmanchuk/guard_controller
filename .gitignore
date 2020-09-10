@@ -4,6 +4,10 @@
 build/
 lib/
 
+/temp
+
+test.c
+
 ./inc/tick.h
 ./inc/pin.h
 ./inc/macro.h
