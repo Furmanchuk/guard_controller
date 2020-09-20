@@ -1,24 +1,9 @@
 /**
- * libsk for SST25VF016B 16 Mbit (2M x *) serial flash memory
+ * lib for SST25VF016B 16 Mbit (2M x *) serial flash memory
  * support for RTC STM32F40xx
  */
 
 #include <stdint.h>
-
-
-/**
- * Initialize for SPI peripheral
- *
- * Note:
- * Used SPI1 STM32F40xx
- * Used SPI1 STM32F40xx
- * SPI pinouts
- * SCK - PA5
- * SO(MOSI) - PB5
- * SI(MISO) - PB4
- * CS(SS) - PD7 (controled by software )
- */
-void sk_flash_init(void);
 
 
 /**

@@ -1,15 +1,17 @@
-# The main (project top) file without .c
-TARGET = test
+# The main (project top) file wit5_10hout .c
+TARGET = gc_main
 # All source files go here:
 SRCS = $(TARGET).c
 # other sources added like that
-SRCS += pin.c tick.c lcd_hd44780.c SST25.c rtc.c
+SRCS += pin.c tick.c lcd_hd44780.c SST25.c rtc.c 
+SRCS += gc_periph_config.c gc_utils.c LSM9DS1.c
 # User defines
 DEFINES = GLSK_BOARD=1
 # The libs which are linked to the resulting target
 LIBS = -Wl,--start-group -lc -lgcc -Wl,--end-group
 LIBS += -lopencm3
 LIBS += -lprintf
+LIBS += -lm
 # Possible values: debug, release
 PROFILE = debug
 # Use semihosting or not. Possible values: 0, 1
@@ -82,7 +84,7 @@ CC = $(TOOLCHAIN_PREFIX)gcc
 CPP = $(TOOLCHAIN_PREFIX)g++
 # Change to assembler-with-cpp if also using C++
 AS = $(TOOLCHAIN_PREFIX)gcc -x assembler
-CP = $(TOOLCHAIN_PREFIX)objcopy
+CP = $(TOOLCHAIN_PREFIX)objcopy #--prefix-symbols=gc.o
 SZ = $(TOOLCHAIN_PREFIX)size -G -d
 GDB = $(TOOLCHAIN_PREFIX)gdb
 OOCD ?= openocd -f openocd_glstarterkit.cfg

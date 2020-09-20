@@ -34,7 +34,19 @@ struct rtc_date{
 	uint8_t day;
 };
 
+
 typedef struct rtc_date rtc_date;
+
+ /**
+  * Binary-Coded Decimal
+  */
+struct BCD{
+	uint8_t tens;
+	uint8_t units;
+};
+
+
+typedef struct BCD BCD;
 
 
 /**
@@ -55,6 +67,32 @@ void RTC_init(rtc_date *date, enum rcc_osc rtc_osc);
  * @date: RTC time and date type (:c:type:`rtc_date`)
 */
 void rtc_set_date(rtc_date *date);
+
+
+//ToDo: Add description
+BCD rtc_get_BCD_hour(void);
+
+
+BCD rtc_get_BCD_minute(void);
+
+
+BCD rtc_get_BCD_second(void);
+
+
+uint8_t rtc_get_notation(void);
+
+
+BCD rtc_get_BCD_year(void);
+
+
+uint8_t rtc_get_BCD_week_day(void);
+
+
+BCD rtc_get_BCD_month(void);
+
+
+BCD rtc_get_BCD_day(void);
+
 
 
 /**

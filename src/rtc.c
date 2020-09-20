@@ -16,16 +16,16 @@ static inline uint8_t get_bcd_units(uint8_t value)
 
 
 // Convert from BDC format to decimal
-static inline uint8_t bcd_to_dec(uint8_t tens, uint8_t units)
+static inline uint8_t bcd_to_dec(BCD number)
 {
-    return tens * 10 + units;
+    return number.tens * 10 + number.units;
 }
 
 
 void rtc_set_date(rtc_date *date)
 {
    // set time
-    uint32_t tr = RTC_TR;
+    uint32_t tr = 0;
     // set hours
     tr |= ((get_bcd_tens(date->hour) & RTC_TR_HT_MASK) << RTC_TR_HT_SHIFT);
     tr |= ((get_bcd_units(date->hour) & RTC_TR_HU_MASK) << RTC_TR_HU_SHIFT);
@@ -58,38 +58,97 @@ void rtc_set_date(rtc_date *date)
 }
 
 
+BCD rtc_get_BCD_hour(void)
+{
+	BCD hour;
+	hour.tens = ((RTC_TR & (RTC_TR_HT_MASK << RTC_TR_HT_SHIFT)) >> 20);
+	hour.units = ((RTC_TR & (RTC_TR_HU_MASK << RTC_TR_HU_SHIFT)) >> 16);
+	return hour;
+}
+
+
+BCD rtc_get_BCD_minute(void)
+{
+	BCD minute;
+	minute.tens = ((RTC_TR & (RTC_TR_MNT_MASK << RTC_TR_MNT_SHIFT)) >> 12);
+	minute.units = ((RTC_TR & (RTC_TR_MNU_MASK << RTC_TR_MNU_SHIFT)) >> 8);
+	return minute;
+}
+
+
+BCD rtc_get_BCD_second(void)
+{
+	BCD second;
+	second.tens = ((RTC_TR & (RTC_TR_ST_MASK << RTC_TR_ST_SHIFT)) >> 4);
+	second.units = ((RTC_TR & (RTC_TR_SU_MASK << RTC_TR_SU_SHIFT)) >> 0);
+	return second;
+}
+
+
+uint8_t rtc_get_notation(void)
+{
+	return (RTC_TR & RTC_TR_PM);
+}
+
+
+BCD rtc_get_BCD_year(void)
+{
+	BCD year;
+	year.tens = ((RTC_DR & (RTC_DR_YT_MASK << RTC_DR_YT_SHIFT)) >> 20);
+	year.units = ((RTC_DR & (RTC_DR_YU_MASK << RTC_DR_YU_SHIFT)) >> 16);
+	return year;
+}
+
+
+uint8_t rtc_get_BCD_week_day(void)
+{
+	return ((RTC_DR & (RTC_DR_WDU_MASK << RTC_DR_WDU_SHIFT)) >> 15);
+}
+
+
+BCD rtc_get_BCD_month(void)
+{
+	BCD month;
+	month.tens = ((RTC_DR & (RTC_DR_MT_MASK << RTC_DR_MT_SHIFT)) >> 12);
+	month.units = ((RTC_DR & (RTC_DR_MU_MASK << RTC_DR_MU_SHIFT)) >> 8);
+	return month;
+}
+
+
+BCD rtc_get_BCD_day(void)
+{
+	BCD day;
+	day.tens = ((RTC_DR & (RTC_DR_DT_MASK << RTC_DR_DT_SHIFT)) >> 4);
+	day.units = ((RTC_DR & (RTC_DR_DU_MASK << RTC_DR_DU_SHIFT)) >> 0);
+	return day;
+}
+
+
 void rtc_get_date(rtc_date *date)
 {
-    uint8_t tens = 0, units = 0;
-    // get hours
-    tens = ((RTC_TR & (RTC_TR_HT_MASK << RTC_TR_HT_SHIFT)) >> 20);
-	units = ((RTC_TR & (RTC_TR_HU_MASK << RTC_TR_HU_SHIFT)) >> 16);
-	date->hour = bcd_to_dec(tens, units);
+	BCD bcd;
+	// get hours
+	bcd = rtc_get_BCD_hour();
+	date->hour = bcd_to_dec(bcd);
     // get minutes
-	tens = ((RTC_TR & (RTC_TR_MNT_MASK << RTC_TR_MNT_SHIFT)) >> 12);
-	units = ((RTC_TR & (RTC_TR_MNU_MASK << RTC_TR_MNU_SHIFT)) >> 8);
-	date->minute = bcd_to_dec(tens, units);
+	bcd = rtc_get_BCD_minute();
+	date->minute = bcd_to_dec(bcd);
     // get second
-	tens = ((RTC_TR & (RTC_TR_ST_MASK << RTC_TR_ST_SHIFT)) >> 4);
-	units = ((RTC_TR & (RTC_TR_SU_MASK << RTC_TR_SU_SHIFT)) >> 0);
-	date->second = bcd_to_dec(tens, units);
+	bcd = rtc_get_BCD_second();
+	date->second = bcd_to_dec(bcd);
     // get notation
-    date->notation = (RTC_TR & RTC_TR_PM);
+    date->notation = rtc_get_notation();
     // get year
-    tens = ((RTC_DR & (RTC_DR_YT_MASK << RTC_DR_YT_SHIFT)) >> 20);
-	units = ((RTC_DR & (RTC_DR_YU_MASK << RTC_DR_YU_SHIFT)) >> 16);
-	date->year = bcd_to_dec(tens, units);
+    bcd = rtc_get_BCD_year();
+	date->year = bcd_to_dec(bcd);
     // get week day
-    // units = ((RTC_DR & (RTC_DR_WDU_MASK << RTC_DR_WDU_SHIFT)) >> 15);
-    // date->week_day = units;
+    date->week_day = rtc_get_BCD_week_day();
     // get month
-	tens = ((RTC_DR & (RTC_DR_MT_MASK << RTC_DR_MT_SHIFT)) >> 12);
-	units = ((RTC_DR & (RTC_DR_MU_MASK << RTC_DR_MU_SHIFT)) >> 8);
-	date->month = bcd_to_dec(tens, units);
+	bcd = rtc_get_BCD_month();
+	date->month = bcd_to_dec(bcd);
     // get day
-	tens = ((RTC_DR & (RTC_DR_DT_MASK << RTC_DR_DT_SHIFT)) >> 4);
-	units = ((RTC_DR & (RTC_DR_DU_MASK << RTC_DR_DU_SHIFT)) >> 0);
-	date->day= bcd_to_dec(tens, units);
+	bcd = rtc_get_BCD_day();
+	date->day= bcd_to_dec(bcd);
 }
 
 
@@ -148,6 +207,12 @@ void RTC_init(rtc_date *date, enum rcc_osc rtc_osc)
 {
     // Powet interface clock enable
 	rcc_periph_clock_enable(RCC_PWR);
+
+	// RTC clock enable
+	// if ((RCC_BDCR & RCC_BDCR_RTCEN))
+	// 	return;
+
+
     // Disable Backup Domain Write Protection.
 	// This allows backup domain registers to be changed.
 	// These registers are write protected after a reset.
